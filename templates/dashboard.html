@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Coates Hire{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-dashboard me-2"></i>Dashboard
+                </h1>
+                <p class="page-subtitle">Welcome back, {{ current_user.first_name }}! Here's your overview.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card card-customers">
+                <div class="stats-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 class="stats-number">{{ total_customers }}</h3>
+                    <p class="stats-label">Total Customers</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card card-equipment">
+                <div class="stats-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 class="stats-number">{{ total_equipment }}</h3>
+                    <p class="stats-label">Total Equipment</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card card-available">
+                <div class="stats-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 class="stats-number">{{ available_equipment }}</h3>
+                    <p class="stats-label">Available Equipment</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card card-bookings">
+                <div class="stats-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 class="stats-number">{{ active_bookings }}</h3>
+                    <p class="stats-label">Active Bookings</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts and Recent Activity -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Equipment by Category</h5>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; display: flex; align-items: center; justify-content: center;">
+                        <canvas id="equipmentChart" style="max-height: 250px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Recent Quotes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="recent-quotes" style="max-height: 300px; overflow-y: auto;">
+                        {% if recent_quotes %}
+                            {% for quote in recent_quotes %}
+                            <div class="quote-item">
+                                <div class="quote-info">
+                                    <h6 class="quote-number">{{ quote.quote_number }}</h6>
+                                    <p class="quote-customer">{{ quote.customer.company_name }}</p>
+                                    <p class="quote-amount">${{ "%.2f"|format(quote.total) }}</p>
+                                </div>
+                                <div class="quote-status">
+                                    <span class="badge badge-{{ quote.status }}">{{ quote.status|title }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-info-circle me-2"></i>No recent quotes
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Equipment Status Overview -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Equipment Status Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for item in equipment_stats %}
+                        {% set total = item.total %}
+                        {% set available = item.available %}
+                        {% set percentage = (available / total * 100) if total > 0 else 0 %}
+                        <div class="col-md-3 mb-3">
+                            <div class="equipment-category-card">
+                                <h6 class="category-name">{{ item.category }}</h6>
+                                <div class="category-stats">
+                                    <span class="total">{{ total }} Total</span>
+                                    <span class="available">{{ available }} Available</span>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-success" 
+                                         style="width: {{ "%.1f"|format(percentage) }}%">
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{ "%.1f"|format(percentage) }}% Available</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <a href="{{ url_for('quote') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-file-alt me-2"></i>Create Quote
+                        </a>
+                        <a href="{{ url_for('booking') }}" class="btn btn-success btn-lg">
+                            <i class="fas fa-calendar-check me-2"></i>New Booking
+                        </a>
+                        <a href="{{ url_for('customers') }}" class="btn btn-info btn-lg">
+                            <i class="fas fa-users me-2"></i>Manage Customers
+                        </a>
+                        <a href="{{ url_for('reports') }}" class="btn btn-warning btn-lg">
+                            <i class="fas fa-chart-bar me-2"></i>View Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+// Equipment utilization chart
+const equipmentData = {{ equipment_stats|tojson }};
+console.log('Equipment data:', equipmentData);
+
+if (equipmentData && equipmentData.length > 0) {
+    const ctx = document.getElementById('equipmentChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: equipmentData.map(item => item.category),
+            datasets: [{
+                data: equipmentData.map(item => item.total),
+                backgroundColor: [
+                    '#FF6B35',
+                    '#F7931E',
+                    '#FFD23F',
+                    '#06FFA5',
+                    '#118AB2',
+                    '#073B4C'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const item = equipmentData[context.dataIndex];
+                            return `${context.label}: ${item.total} total (${item.available} available)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+} else {
+    // Show message if no data
+    document.getElementById('equipmentChart').style.display = 'none';
+    document.querySelector('#equipmentChart').parentElement.innerHTML = 
+        '<div class="text-center text-muted p-4"><i class="fas fa-info-circle me-2"></i>No equipment data available</div>';
+}
+</script>
+{% endblock %}

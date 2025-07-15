@@ -1,0 +1,471 @@
+/* Coates Hire - Animations Stylesheet */
+
+/* GSAP Animation Classes */
+.gsap-fade-in {
+    opacity: 0;
+}
+
+.gsap-slide-up {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.gsap-slide-left {
+    opacity: 0;
+    transform: translateX(-30px);
+}
+
+.gsap-scale-in {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+/* Loading Animations */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 107, 53, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-dots {
+   display: inline-block;
+}
+
+.loading-dots::after {
+   content: '';
+   animation: dots 1.5s steps(5, end) infinite;
+}
+
+@keyframes dots {
+   0%, 20% { content: '.'; }
+   40% { content: '..'; }
+   60% { content: '...'; }
+   90%, 100% { content: ''; }
+}
+
+/* Pulse Animation */
+.pulse {
+   animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+   0% { transform: scale(1); }
+   50% { transform: scale(1.05); }
+   100% { transform: scale(1); }
+}
+
+/* Bounce Animation */
+.bounce {
+   animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+   0%, 20%, 53%, 80%, 100% { transform: translateY(0); }
+   40%, 43% { transform: translateY(-10px); }
+   70% { transform: translateY(-5px); }
+   90% { transform: translateY(-2px); }
+}
+
+/* Shake Animation */
+.shake {
+   animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+   0%, 100% { transform: translateX(0); }
+   10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+   20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
+/* Slide Animations */
+.slide-in-top {
+   animation: slideInTop 0.5s ease-out;
+}
+
+@keyframes slideInTop {
+   from {
+       opacity: 0;
+       transform: translateY(-50px);
+   }
+   to {
+       opacity: 1;
+       transform: translateY(0);
+   }
+}
+
+.slide-in-bottom {
+   animation: slideInBottom 0.5s ease-out;
+}
+
+@keyframes slideInBottom {
+   from {
+       opacity: 0;
+       transform: translateY(50px);
+   }
+   to {
+       opacity: 1;
+       transform: translateY(0);
+   }
+}
+
+.slide-in-left {
+   animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+   from {
+       opacity: 0;
+       transform: translateX(-50px);
+   }
+   to {
+       opacity: 1;
+       transform: translateX(0);
+   }
+}
+
+.slide-in-right {
+   animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideInRight {
+   from {
+       opacity: 0;
+       transform: translateX(50px);
+   }
+   to {
+       opacity: 1;
+       transform: translateX(0);
+   }
+}
+
+/* Scale Animations */
+.scale-in {
+   animation: scaleIn 0.4s ease-out;
+}
+
+@keyframes scaleIn {
+   from {
+       opacity: 0;
+       transform: scale(0.8);
+   }
+   to {
+       opacity: 1;
+       transform: scale(1);
+   }
+}
+
+.scale-out {
+   animation: scaleOut 0.3s ease-in;
+}
+
+@keyframes scaleOut {
+   from {
+       opacity: 1;
+       transform: scale(1);
+   }
+   to {
+       opacity: 0;
+       transform: scale(0.8);
+   }
+}
+
+/* Rotate Animations */
+.rotate-in {
+   animation: rotateIn 0.6s ease-out;
+}
+
+@keyframes rotateIn {
+   from {
+       opacity: 0;
+       transform: rotate(-180deg) scale(0.8);
+   }
+   to {
+       opacity: 1;
+       transform: rotate(0deg) scale(1);
+   }
+}
+
+/* Flip Animations */
+.flip-in-x {
+   animation: flipInX 0.6s ease-out;
+}
+
+@keyframes flipInX {
+   from {
+       opacity: 0;
+       transform: perspective(400px) rotateX(90deg);
+   }
+   40% {
+       transform: perspective(400px) rotateX(-20deg);
+   }
+   60% {
+       transform: perspective(400px) rotateX(10deg);
+   }
+   80% {
+       transform: perspective(400px) rotateX(-5deg);
+   }
+   to {
+       opacity: 1;
+       transform: perspective(400px) rotateX(0deg);
+   }
+}
+
+/* Fade Animations */
+.fade-in-up {
+   animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+   from {
+       opacity: 0;
+       transform: translateY(30px);
+   }
+   to {
+       opacity: 1;
+       transform: translateY(0);
+   }
+}
+
+.fade-in-down {
+   animation: fadeInDown 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+   from {
+       opacity: 0;
+       transform: translateY(-30px);
+   }
+   to {
+       opacity: 1;
+       transform: translateY(0);
+   }
+}
+
+/* Hover Animations */
+.hover-lift {
+   transition: transform 0.3s ease;
+}
+
+.hover-lift:hover {
+   transform: translateY(-5px);
+}
+
+.hover-glow {
+   transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+   box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+}
+
+.hover-scale {
+   transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+   transform: scale(1.05);
+}
+
+/* Loading States */
+.btn-loading {
+   position: relative;
+   pointer-events: none;
+}
+
+.btn-loading::after {
+   content: '';
+   position: absolute;
+   width: 16px;
+   height: 16px;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   margin: auto;
+   border: 2px solid transparent;
+   border-top-color: #ffffff;
+   border-radius: 50%;
+   animation: spin 1s linear infinite;
+}
+
+/* Progress Bar Animations */
+.progress-bar-animated {
+   animation: progressMove 2s linear infinite;
+}
+
+@keyframes progressMove {
+   0% { background-position: 0 0; }
+   100% { background-position: 40px 0; }
+}
+
+/* Counter Animation */
+.counter {
+   transition: all 0.3s ease;
+}
+
+/* Stagger Animation Delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* Equipment Card Animations */
+.equipment-card {
+   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.equipment-card:hover {
+   transform: translateY(-8px) scale(1.02);
+}
+
+.equipment-card:hover img {
+   transform: scale(1.1);
+   transition: transform 0.3s ease;
+}
+
+/* Modal Animations */
+.modal.fade .modal-dialog {
+   transition: transform 0.3s ease-out;
+   transform: translate(0, -50px);
+}
+
+.modal.show .modal-dialog {
+   transform: none;
+}
+
+/* Toast Animations */
+.toast {
+   animation: slideInRight 0.3s ease-out;
+}
+
+.toast.hide {
+   animation: slideOutRight 0.3s ease-in;
+}
+
+@keyframes slideOutRight {
+   from {
+       opacity: 1;
+       transform: translateX(0);
+   }
+   to {
+       opacity: 0;
+       transform: translateX(100%);
+   }
+}
+
+/* Chart Animations */
+.chart-container {
+   animation: fadeInUp 0.8s ease-out;
+}
+
+/* Form Animations */
+.form-control:focus {
+   animation: formFocus 0.3s ease-out;
+}
+
+@keyframes formFocus {
+   0% { transform: scale(1); }
+   50% { transform: scale(1.02); }
+   100% { transform: scale(1); }
+}
+
+/* Table Row Animations */
+.table tbody tr {
+   animation: fadeInUp 0.4s ease-out;
+}
+
+.table tbody tr:hover {
+   transition: all 0.2s ease;
+}
+
+/* Badge Animations */
+.badge {
+   animation: scaleIn 0.3s ease-out;
+}
+
+/* Status Indicator Animations */
+.status-indicator {
+   position: relative;
+   display: inline-block;
+}
+
+.status-indicator::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   border-radius: 50%;
+   animation: pulse 2s infinite;
+}
+
+.status-available::before { background-color: rgba(40, 167, 69, 0.3); }
+.status-busy::before { background-color: rgba(255, 193, 7, 0.3); }
+.status-maintenance::before { background-color: rgba(220, 53, 69, 0.3); }
+
+/* 3D Tilt Effect */
+.tilt-3d {
+   transition: transform 0.3s ease;
+   transform-style: preserve-3d;
+}
+
+.tilt-3d:hover {
+   transform: perspective(1000px) rotateX(10deg) rotateY(10deg) rotateZ(2deg);
+}
+
+/* Parallax Effect */
+.parallax {
+   transition: transform 0.1s ease-out;
+}
+
+/* Ripple Effect */
+.ripple {
+   position: relative;
+   overflow: hidden;
+   transform: translate3d(0, 0, 0);
+}
+
+.ripple:before {
+   content: '';
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   width: 0;
+   height: 0;
+   border-radius: 50%;
+   background: rgba(255, 255, 255, 0.5);
+   transform: translate(-50%, -50%);
+   transition: width 0.6s, height 0.6s;
+}
+
+.ripple:active:before {
+   width: 300px;
+   height: 300px;
+}
+
+/* Smooth Scroll */
+html {
+   scroll-behavior: smooth;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+   *,
+   *::before,
+   *::after {
+       animation-duration: 0.01ms !important;
+       animation-iteration-count: 1 !important;
+       transition-duration: 0.01ms !important;
+       scroll-behavior: auto !important;
+   }
+}

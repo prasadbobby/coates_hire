@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Add Customer - Coates Hire{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-user-plus me-2"></i>Add New Customer
+                </h1>
+                <div class="page-actions">
+                    <a href="{{ url_for('customers') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Customers
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Customer Form -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="company_name" class="form-label">Company Name *</label>
+                                    <input type="text" class="form-control" id="company_name" name="company_name" required>
+                                    <div class="invalid-feedback">Please provide a company name.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="abn" class="form-label">ABN</label>
+                                    <input type="text" class="form-control" id="abn" name="abn" placeholder="12345678901">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="contact_name" class="form-label">Contact Name *</label>
+                                    <input type="text" class="form-control" id="contact_name" name="contact_name" required>
+                                    <div class="invalid-feedback">Please provide a contact name.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                    <div class="invalid-feedback">Please provide a valid email address.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone *</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" required>
+                                    <div class="invalid-feedback">Please provide a phone number.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="payment_terms" class="form-label">Payment Terms</label>
+                                    <select class="form-select" id="payment_terms" name="payment_terms">
+                                        <option value="7 days">7 days</option>
+                                        <option value="14 days">14 days</option>
+                                        <option value="30 days" selected>30 days</option>
+                                        <option value="45 days">45 days</option>
+                                        <option value="60 days">60 days</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="2"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="city" class="form-label">City</label>
+                                    <input type="text" class="form-control" id="city" name="city">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="state" class="form-label">State</label>
+                                    <select class="form-select" id="state" name="state">
+                                        <option value="">Select state...</option>
+                                        <option value="NSW">NSW</option>
+                                        <option value="VIC">VIC</option>
+                                        <option value="QLD">QLD</option>
+                                        <option value="SA">SA</option>
+                                        <option value="WA">WA</option>
+                                        <option value="TAS">TAS</option>
+                                        <option value="NT">NT</option>
+                                        <option value="ACT">ACT</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="postal_code" class="form-label">Postal Code</label>
+                                    <input type="text" class="form-control" id="postal_code" name="postal_code">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="credit_limit" class="form-label">Credit Limit ($)</label>
+                            <input type="number" class="form-control" id="credit_limit" name="credit_limit" min="0" step="0.01" value="0">
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Customer
+                            </button>
+                            <a href="{{ url_for('customers') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

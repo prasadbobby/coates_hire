@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block title %}Contracts - Coates Hire{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-file-contract me-2"></i>Contracts
+                </h1>
+                <p class="page-subtitle">Manage equipment hire contracts and digital signatures</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contracts Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Contract List</h5>
+                        <button class="btn btn-primary" onclick="generateNewContract()">
+                            <i class="fas fa-plus me-2"></i>Generate Contract
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Contract #</th>
+                                    <th>Customer</th>
+                                    <th>Booking #</th>
+                                    <th>Value</th>
+                                    <th>Status</th>
+                                    <th>Created Date</th>
+                                    <th>Signed Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contract in contracts %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ contract.contract_number }}</strong>
+                                    </td>
+                                    <td>{{ contract.customer.company_name }}</td>
+                                    <td>{{ contract.booking.booking_number }}</td>
+                                    <td>${{ "%.2f"|format(contract.booking.total_amount) }}</td>
+                                    <td>
+                                        <span class="badge badge-{{ contract.signature_status }}">
+                                            {{ contract.signature_status|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ contract.created_at.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        {% if contract.signed_date %}
+                                            {{ contract.signed_date.strftime('%d/%m/%Y') }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" 
+                                                    onclick="viewContract({{ contract.id }})">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            {% if contract.signature_status == 'pending' %}
+                                            <button class="btn btn-sm btn-outline-success" 
+                                                    onclick="sendForSignature({{ contract.id }})">
+                                                <i class="fas fa-signature"></i>
+                                            </button>
+                                            {% endif %}
+                                            <button class="btn btn-sm btn-outline-secondary" 
+                                                    onclick="downloadContract({{ contract.id }})">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contract Preview Modal -->
+<div class="modal fade" id="contractModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Contract Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="contractPreview" class="contract-preview">
+                    <!-- Contract content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="printContract()">
+                    <i class="fas fa-print me-2"></i>Print
+                </button>
+                <button type="button" class="btn btn-success" onclick="sendForSignature()">
+                    <i class="fas fa-signature me-2"></i>Send for Signature
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Generate Contract Modal -->
+<div class="modal fade" id="generateContractModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Generate New Contract</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="generateContractForm">
+                    <div class="mb-3">
+                        <label class="form-label">Select Booking</label>
+                        <select class="form-select" id="bookingSelect" required>
+                            <option value="">Choose a booking...</option>
+                            <!-- Bookings will be loaded here -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contract Template</label>
+                        <select class="form-select" id="templateSelect" required>
+                            <option value="standard">Standard Equipment Hire</option>
+                            <option value="construction">Construction Project</option>
+                            <option value="mining">Mining Operations</option>
+                            <option value="events">Events & Entertainment</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Additional Terms</label>
+                        <textarea class="form-control" id="additionalTerms" rows="3" 
+                                  placeholder="Any additional terms and conditions..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="generateContract()">
+                    <i class="fas fa-file-contract me-2"></i>Generate Contract
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function viewContract(contractId) {
+    // Load contract preview
+    $('#contractModal').modal('show');
+    $('#contractPreview').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading contract...</div>');
+    
+    // Simulate contract loading
+    setTimeout(() => {
+        $('#contractPreview').html(`
+            <div class="contract-document">
+                <div class="contract-header text-center mb-4">
+                    <h3>EQUIPMENT HIRE AGREEMENT</h3>
+                    <p class="text-muted">Contract #: CNT${contractId.toString().padStart(6, '0')}</p>
+                </div>
+                
+                <div class="contract-parties mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>HIRER:</h6>
+                            <p>ABC Construction Pty Ltd<br>
+                            123 Builder Street<br>
+                            Sydney, NSW 2000<br>
+                            ABN: 12345678901</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>OWNER:</h6>
+                            <p>Coates Hire Operations Pty Ltd<br>
+                            Level 2, 141 Camberwell Road<br>
+                            Hawthorn East, VIC 3123<br>
+                            ABN: 91 076 371 344</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contract-terms mb-4">
+                    <h6>TERMS AND CONDITIONS:</h6>
+                    <ol>
+                        <li>The Hirer acknowledges receipt of the equipment in good working order.</li>
+                        <li>The Hirer is responsible for the safe operation and return of the equipment.</li>
+                        <li>Damage to equipment will be charged at replacement cost.</li>
+                        <li>Payment terms are 30 days from invoice date.</li>
+                        <li>This agreement is subject to Coates Hire standard terms and conditions.</li>
+                    </ol>
+                </div>
+                
+                <div class="contract-equipment mb-4">
+                    <h6>EQUIPMENT SCHEDULE:</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Equipment</th>
+                                <th>Quantity</th>
+                                <th>Rate</th>
+                                <th>Period</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>20T Excavator - CAT 320</td>
+                                <td>1</td>
+                                <td>$850.00/day</td>
+                                <td>7 days</td>
+                                <td>$5,950.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="contract-signatures">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="signature-block">
+                                <p><strong>HIRER SIGNATURE:</strong></p>
+                                <div class="signature-line"></div>
+                                <p class="mt-2">
+                                    Name: _________________________<br>
+                                    Date: _________________________
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="signature-block">
+                                <p><strong>OWNER SIGNATURE:</strong></p>
+                                <div class="signature-line"></div>
+                                <p class="mt-2">
+                                    Name: _________________________<br>
+                                    Date: _________________________
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+    }, 1000);
+}
+
+function generateNewContract() {
+    $('#generateContractModal').modal('show');
+    
+    // Load available bookings
+    loadAvailableBookings();
+}
+
+function loadAvailableBookings() {
+    // Simulate loading bookings
+    const bookingSelect = $('#bookingSelect');
+    bookingSelect.html('<option value="">Choose a booking...</option>');
+    
+    // Add sample bookings
+    const sampleBookings = [
+        {id: 1, number: 'B20241215001', customer: 'ABC Construction', value: '$5,950.00'},
+        {id: 2, number: 'B20241215002', customer: 'XYZ Mining', value: '$12,500.00'},
+        {id: 3, number: 'B20241215003', customer: 'Green Energy', value: '$8,750.00'}
+    ];
+    
+    sampleBookings.forEach(booking => {
+        bookingSelect.append(`<option value="${booking.id}">${booking.number} - ${booking.customer} (${booking.value})</option>`);
+    });
+}
+
+function generateContract() {
+    const bookingId = $('#bookingSelect').val();
+    const template = $('#templateSelect').val();
+    const additionalTerms = $('#additionalTerms').val();
+    
+    if (!bookingId) {
+        alert('Please select a booking.');
+        return;
+    }
+    
+    // Simulate contract generation
+    alert('Contract generated successfully!');
+    $('#generateContractModal').modal('hide');
+    
+    // Reload page to show new contract
+    location.reload();
+}
+
+function sendForSignature(contractId) {
+    if (confirm('Send this contract for digital signature?')) {
+        alert('Contract sent for signature via email.');
+    }
+}
+
+function downloadContract(contractId) {
+    // Simulate PDF download
+    alert('Contract PDF downloaded.');
+}
+
+function printContract() {
+    window.print();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Create Quote - Coates Hire{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-file-alt me-2"></i>Create Quote
+                </h1>
+                <p class="page-subtitle">Generate a new equipment hire quote</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quote Form -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form id="quoteForm">
+                        <!-- Customer Selection -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Customer</label>
+                                <select class="form-select" id="customerId" name="customer_id" required>
+                                    <option value="">Select a customer...</option>
+                                    {% for customer in customers %}
+                                    <option value="{{ customer.id }}">{{ customer.company_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Job Name</label>
+                                <input type="text" class="form-control" id="jobName" name="job_name" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Job Details -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <label class="form-label">Job Address</label>
+                                <textarea class="form-control" id="jobAddress" name="job_address" rows="2" required></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Hire Dates -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Hire Start Date</label>
+                                <input type="date" class="form-control" id="hireStartDate" name="hire_start_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Hire End Date</label>
+                                <input type="date" class="form-control" id="hireEndDate" name="hire_end_date" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Equipment Selection -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="mb-3">Equipment Selection</h5>
+                                <div class="equipment-grid" id="equipmentGrid">
+                                    <div class="text-center">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>Loading equipment...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Selected Equipment -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="mb-3">Selected Equipment</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="selectedEquipmentTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Equipment</th>
+                                                <th>Quantity</th>
+                                                <th>Duration (Days)</th>
+                                                <th>Unit Rate</th>
+                                                <th>Total</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="selectedEquipmentBody">
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted">
+                                                    <i class="fas fa-info-circle me-2"></i>No equipment selected
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quote Summary -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 offset-md-6">
+                                <div class="quote-summary">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td>Subtotal:</td>
+                                            <td class="text-end" id="subtotal">$0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Discount:</td>
+                                            <td class="text-end">
+                                                <input type="number" class="form-control form-control-sm" 
+                                                       id="discount" value="0" min="0" step="0.01">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>GST (10%):</td>
+                                            <td class="text-end" id="gst">$0.00</td>
+                                        </tr>
+                                        <tr class="table-dark">
+                                            <td><strong>Total:</strong></td>
+                                            <td class="text-end"><strong id="total">$0.00</strong></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-secondary" onclick="saveDraft()">
+                                        <i class="fas fa-save me-2"></i>Save Draft
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane me-2"></i>Create Quote
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="createAndBook()">
+                                        <i class="fas fa-calendar-check me-2"></i>Create & Book
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Equipment Selection Modal -->
+<div class="modal fade" id="equipmentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Equipment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img id="equipmentImage" class="img-fluid rounded" alt="Equipment">
+                    </div>
+                    <div class="col-md-8">
+                        <h6 id="equipmentName"></h6>
+                        <p id="equipmentDescription"></p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="equipmentQuantity" min="1" value="1">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Duration (Days)</label>
+                                <input type="number" class="form-control" id="equipmentDuration" min="1" value="1">
+                            </div>
+                        </div>
+                        <div class="pricing-info mt-3">
+                            <p><strong>Daily Rate:</strong> $<span id="dailyRate"></span></p>
+                            <p><strong>Weekly Rate:</strong> $<span id="weeklyRate"></span></p>
+                            <p><strong>Monthly Rate:</strong> $<span id="monthlyRate"></span></p>
+                        </div>
+                        <div id="equipmentSpecs" class="mt-3">
+                            <!-- Equipment specifications will be shown here -->
+                        </div>
+                        <div class="mt-3">
+                            <p><strong>Total Cost:</strong> <span id="modalTotalCost">$0.00</span> <small id="modalRateType"></small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addEquipmentToQuote()">Add to Quote</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/quote.js') }}"></script>
+<script>
+// No variable declarations here - everything is handled in quote.js
+
+function createAndBook() {
+    // Set flag to create booking after quote creation
+    window.createBookingAfterQuote = true;
+    
+    // Trigger quote creation
+    if (validateQuoteForm()) {
+        createQuote();
+    }
+}
+</script>
+{% endblock %}
